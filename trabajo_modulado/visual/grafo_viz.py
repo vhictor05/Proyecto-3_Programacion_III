@@ -5,7 +5,7 @@ import streamlit as st
 
 def visualizar_red(G, ruta=None):
     pos = nx.spring_layout(G, seed=42)
-    role_colors = {"storage": "orange", "recharge": "blue", "client": "green"}
+    role_colors = {"storage": "blue", "recharge": "green", "client": "red"}
     node_colors = [role_colors[G.nodes[n]["role"]] for n in G.nodes]
 
     plt.figure(figsize=(10,7))
@@ -16,7 +16,7 @@ def visualizar_red(G, ruta=None):
 
     if ruta:
         aristas_ruta = list(zip(ruta, ruta[1:]))
-        nx.draw_networkx_edges(G, pos, edgelist=aristas_ruta, edge_color='red', width=3)
+        nx.draw_networkx_edges(G, pos, edgelist=aristas_ruta, edge_color='orange', width=3)
         otras_aristas = [e for e in G.edges if e not in aristas_ruta and (e[1], e[0]) not in aristas_ruta]
         nx.draw_networkx_edges(G, pos, edgelist=otras_aristas, alpha=0.3)
         nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)

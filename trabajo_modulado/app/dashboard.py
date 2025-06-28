@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -13,21 +16,21 @@ from utils.helpers import calcular_visitas_por_nodo
 
 st.set_page_config(page_title="Dashboard con 5 Pestañas", layout="wide")
 
-st.title("🚁 Drone Logistics Simulator - Correos Chile")
-st.markdown("Node Role Proportions:")
-st.markdown("• 📦 Storage Node: 20%")
-st.markdown("• 🔋 Recharge Node: 20%")
-st.markdown("• 👤 Client Node: 60%")
+st.title("🚁  Simulador logistico de drones - Correos Chile")
+st.markdown("Proporciones de roles de nodo:")
+st.markdown("• 📦 Nodo de almacenamiento: 20%")
+st.markdown("• ⚡️ Nodo de recarga: 20%")
+st.markdown("• 🙍‍♂️ Nodo cliente: 60%")
 
 tabs = st.tabs(["Run Simulation", "Explore Network", "Clients & Orders", "Route Analytics", "Statistics"])
 
 with tabs[0]:
-    st.header("⚙️ Initialize Simulation")
+    st.header("⚙️ Iniciar simulación")
     n_nodes = st.slider("Number of Nodes", min_value=10, max_value=150, value=15)
     n_edges = st.slider("Number of Edges", min_value=n_nodes-1, max_value=300, value=20)
     n_orders = st.slider("Number of Orders", min_value=1, max_value=500, value=10)
 
-    if st.button("Initialize Simulation"):
+    if st.button("Iniciar simulación"):
         nodos = generar_nodos(n_nodes)
         G = generar_aristas_aleatorias(nodos, n_edges)
         ordenes = generar_ordenes(n_orders, nodos)
@@ -225,7 +228,7 @@ with tabs[4]:
         with col1:
             st.subheader("Clientes más visitados")
             fig1, ax1 = plt.subplots(figsize=(6, 4))
-            ax1.bar(df_clientes["Nodo"], df_clientes["Visitas"], color="skyblue")
+            ax1.bar(df_clientes["Nodo"], df_clientes["Visitas"], color="red")
             ax1.set_xlabel("Cliente")
             ax1.set_ylabel("Visitas")
             ax1.tick_params(axis="x", rotation=45)
@@ -237,7 +240,7 @@ with tabs[4]:
         with col2:
             st.subheader("Recarga más usada")
             fig2, ax2 = plt.subplots(figsize=(6, 4))
-            ax2.bar(df_recarga["Nodo"], df_recarga["Visitas"], color="lightgreen")
+            ax2.bar(df_recarga["Nodo"], df_recarga["Visitas"], color="green")
             ax2.set_xlabel("Recarga")
             ax2.set_ylabel("Visitas")
             ax2.tick_params(axis="x", rotation=45)
@@ -249,7 +252,7 @@ with tabs[4]:
         with col3:
             st.subheader("Storage más visitado")
             fig3, ax3 = plt.subplots(figsize=(6, 4))
-            ax3.bar(df_storage["Nodo"], df_storage["Visitas"], color="salmon")
+            ax3.bar(df_storage["Nodo"], df_storage["Visitas"], color="blue")
             ax3.set_xlabel("Storage")
             ax3.set_ylabel("Visitas")
             ax3.tick_params(axis="x", rotation=45)
