@@ -1,0 +1,229 @@
+{
+    "directed": false,
+    "multigraph": false,
+    "graph": {},
+    "nodes": [
+        {
+            "role": "storage",
+            "id": "A"
+        },
+        {
+            "role": "storage",
+            "id": "B"
+        },
+        {
+            "role": "storage",
+            "id": "C"
+        },
+        {
+            "role": "storage",
+            "id": "D"
+        },
+        {
+            "role": "storage",
+            "id": "E"
+        },
+        {
+            "role": "recharge",
+            "id": "F"
+        },
+        {
+            "role": "recharge",
+            "id": "G"
+        },
+        {
+            "role": "recharge",
+            "id": "H"
+        },
+        {
+            "role": "recharge",
+            "id": "I"
+        },
+        {
+            "role": "recharge",
+            "id": "J"
+        },
+        {
+            "role": "client",
+            "id": "K"
+        },
+        {
+            "role": "client",
+            "id": "L"
+        },
+        {
+            "role": "client",
+            "id": "M"
+        },
+        {
+            "role": "client",
+            "id": "N"
+        },
+        {
+            "role": "client",
+            "id": "O"
+        },
+        {
+            "role": "client",
+            "id": "P"
+        },
+        {
+            "role": "client",
+            "id": "Q"
+        },
+        {
+            "role": "client",
+            "id": "R"
+        },
+        {
+            "role": "client",
+            "id": "S"
+        },
+        {
+            "role": "client",
+            "id": "T"
+        },
+        {
+            "role": "client",
+            "id": "U"
+        },
+        {
+            "role": "client",
+            "id": "V"
+        },
+        {
+            "role": "client",
+            "id": "W"
+        },
+        {
+            "role": "client",
+            "id": "X"
+        },
+        {
+            "role": "client",
+            "id": "Y"
+        }
+    ],
+    "links": [
+        {
+            "weight": 5,
+            "source": "A",
+            "target": "B"
+        },
+        {
+            "weight": 6,
+            "source": "B",
+            "target": "C"
+        },
+        {
+            "weight": 3,
+            "source": "C",
+            "target": "D"
+        },
+        {
+            "weight": 5,
+            "source": "D",
+            "target": "E"
+        },
+        {
+            "weight": 3,
+            "source": "E",
+            "target": "F"
+        },
+        {
+            "weight": 4,
+            "source": "F",
+            "target": "G"
+        },
+        {
+            "weight": 8,
+            "source": "G",
+            "target": "H"
+        },
+        {
+            "weight": 2,
+            "source": "H",
+            "target": "I"
+        },
+        {
+            "weight": 4,
+            "source": "I",
+            "target": "J"
+        },
+        {
+            "weight": 3,
+            "source": "J",
+            "target": "K"
+        },
+        {
+            "weight": 7,
+            "source": "K",
+            "target": "L"
+        },
+        {
+            "weight": 2,
+            "source": "L",
+            "target": "M"
+        },
+        {
+            "weight": 7,
+            "source": "M",
+            "target": "N"
+        },
+        {
+            "weight": 4,
+            "source": "N",
+            "target": "O"
+        },
+        {
+            "weight": 4,
+            "source": "O",
+            "target": "P"
+        },
+        {
+            "weight": 8,
+            "source": "P",
+            "target": "Q"
+        },
+        {
+            "weight": 1,
+            "source": "Q",
+            "target": "R"
+        },
+        {
+            "weight": 5,
+            "source": "R",
+            "target": "S"
+        },
+        {
+            "weight": 3,
+            "source": "S",
+            "target": "T"
+        },
+        {
+            "weight": 9,
+            "source": "T",
+            "target": "U"
+        },
+        {
+            "weight": 2,
+            "source": "U",
+            "target": "V"
+        },
+        {
+            "weight": 8,
+            "source": "V",
+            "target": "W"
+        },
+        {
+            "weight": 1,
+            "source": "W",
+            "target": "X"
+        },
+        {
+            "weight": 5,
+            "source": "X",
+            "target": "Y"
+        }
+    ]
+}

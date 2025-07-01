@@ -1,5 +1,6 @@
 import sys
 import os
+import json # For saving data for API
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import streamlit as st
 import matplotlib.pyplot as plt
@@ -11,8 +12,11 @@ from model.grafo import generar_aristas_aleatorias
 from model.ruta import encontrar_ruta_con_bateria
 from model.order import generar_ordenes
 from model.avl import AVLTree
-from visual.grafo_viz import visualizar_red, visualizar_avl
+from visual.grafo_viz import visualizar_mapa_folium, visualizar_avl
 from utils.helpers import calcular_visitas_por_nodo
+from model.grafo import generar_aristas_aleatorias, kruskal_mst
+from model.ruta import encontrar_ruta_con_bateria, dijkstra_with_battery, get_floyd_warshall_paths, reconstruct_path_from_floyd_warshall, calcular_costo
+from utils.reporting import generate_report_pdf # Added PDF report generator
 
 st.set_page_config(page_title="Dashboard con 5 Pestañas", layout="wide")
 
@@ -52,6 +56,26 @@ with tabs[0]:
 
         st.success(f"Simulación inicializada con {n_nodes} nodos, {n_edges} aristas y {n_orders} órdenes.")
 
+        # --- Save data for API ---
+        api_data_path = "api/data"
+        os.makedirs(api_data_path, exist_ok=True)
+        try:
+            with open(os.path.join(api_data_path, "nodos.json"), "w") as f:
+                json.dump(nodos, f, indent=4)
+            with open(os.path.join(api_data_path, "ordenes.json"), "w") as f:
+                json.dump(ordenes, f, indent=4)
+            with open(os.path.join(api_data_path, "rutas_usadas.json"), "w") as f:
+                json.dump(rutas_usadas, f, indent=4)
+            
+            # Serialize graph: NetworkX's node_link_data is a good choice for JSON
+            graph_data = nx.node_link_data(G)
+            with open(os.path.join(api_data_path, "grafo.json"), "w") as f:
+                json.dump(graph_data, f, indent=4)
+            st.toast("Datos de simulación guardados para la API.", icon="💾")
+        except Exception as e:
+            st.error(f"Error al guardar datos para la API: {e}")
+        # --- End save data for API ---
+
 
 
 
@@ -60,31 +84,116 @@ with tabs[1]:
     if "grafo" in st.session_state and "ordenes" in st.session_state:
         G = st.session_state["grafo"]
         nodos_ids = list(G.nodes)
+        nodos_data_list = st.session_state.get("nodos", [])
+        node_attr_map = {n['id']: n for n in nodos_data_list}
+        
+        for node_id_in_graph in G.nodes():
+            if node_id_in_graph in node_attr_map:
+                # Update the node in G with all attributes from the nodos_data_list entry
+                # This includes 'lat', 'lon', 'client_id', 'nombre', 'tipo', etc.
+                G.nodes[node_id_in_graph].update(node_attr_map[node_id_in_graph])
+            else:
+                # This case should ideally not happen if nodos and G are consistent
+                # but good to be aware of. It means a node in G has no corresponding entry in nodos_data_list.
+                # Ensure 'lat' and 'lon' are at least None if not found, to avoid KeyErrors later
+                if 'lat' not in G.nodes[node_id_in_graph]: G.nodes[node_id_in_graph]['lat'] = None
+                if 'lon' not in G.nodes[node_id_in_graph]: G.nodes[node_id_in_graph]['lon'] = None
 
         col1, col2 = st.columns([3, 1])
 
         with col1:
-            if "ruta_actual" in st.session_state and st.session_state["ruta_actual"]:
-                visualizar_red(G, st.session_state["ruta_actual"])
+            # Decide whether to show MST or current route
+            show_mst = st.session_state.get("show_mst", False)
+            mst_edges_to_display = st.session_state.get("mst_edges", None) if show_mst else None
+            
+            current_route_to_display = st.session_state.get("ruta_actual", None)
+            if show_mst and mst_edges_to_display: # Prioritize showing MST if active
+                visualizar_mapa_folium(G, mst_edges=mst_edges_to_display)
+                st.caption("Displaying Minimum Spanning Tree (MST) via Kruskal's Algorithm.")
+            elif current_route_to_display:
+                visualizar_mapa_folium(G, ruta=current_route_to_display)
+                st.caption(f"Displaying route: {' → '.join(current_route_to_display)}")
             else:
-                visualizar_red(G)
+                visualizar_mapa_folium(G)
+                st.caption("Displaying full network. Calculate a route or MST to highlight.")
 
         with col2:
             origen = st.selectbox("Nodo Origen", nodos_ids, key="origen_select")
             destino = st.selectbox("Nodo Destino", nodos_ids, key="destino_select")
+            
+            algorithm_options = ["Optimized with Battery (Custom BFS)", "Dijkstra with Battery", "Floyd-Warshall (Weight Only)"]
+            selected_algorithm = st.radio("Choose Pathfinding Algorithm:", algorithm_options, index=0, key="algo_select")
 
-            if st.button("Calculate Route", key="calc_route"):
+            if st.button("Calculate Route", key="calc_route_new"): # Changed key to avoid conflict if old button state exists
+                st.session_state["ruta_actual"] = None # Reset previous route
+                st.session_state["show_mst"] = False # Clear MST display
+                st.session_state["mst_edges"] = None
+
                 if origen == destino:
                     st.warning("Origen y destino deben ser diferentes.")
-                    st.session_state["ruta_actual"] = None
                 else:
-                    ruta, costo = encontrar_ruta_con_bateria(G, origen, destino)
-                    if ruta is None:
-                        st.error("No se encontró una ruta válida con la restricción de batería.")
-                        st.session_state["ruta_actual"] = None
-                    else:
-                        st.success(f"Ruta encontrada: {' → '.join(ruta)} | Costo total: {costo}")
+                    ruta, costo = None, None
+                    if selected_algorithm == "Optimized with Battery (Custom BFS)":
+                        ruta, costo = encontrar_ruta_con_bateria(G, origen, destino)
+                        if ruta:
+                            st.success(f"Ruta (Custom BFS): {' → '.join(ruta)} | Costo: {costo}")
+                        else:
+                            st.error("No se encontró ruta válida con Custom BFS y restricción de batería.")
+                    
+                    elif selected_algorithm == "Dijkstra with Battery":
+                        # MAX_BATTERY is available from model.ruta, but good to have it accessible or passed if configurable
+                        # from model.ruta import MAX_BATTERY # Not needed if already imported or value is fixed
+                        ruta, costo = dijkstra_with_battery(G, origen, destino) # Uses default MAX_BATTERY from ruta.py
+                        if ruta:
+                            st.success(f"Ruta (Dijkstra with Battery): {' → '.join(ruta)} | Costo: {costo}")
+                        else:
+                            st.error("No se encontró ruta válida con Dijkstra y restricción de batería.")
+
+                    elif selected_algorithm == "Floyd-Warshall (Weight Only)":
+                        # Compute FW if not already in session state or if graph changed (not explicitly checked here)
+                        if "fw_predecessors" not in st.session_state or "fw_distances" not in st.session_state or st.session_state.get("fw_graph_id") != id(G):
+                            st.info("Calculando rutas Floyd-Warshall (puede tardar para grafos grandes)...")
+                            fw_preds, fw_dists = get_floyd_warshall_paths(G)
+                            if fw_preds is not None and fw_dists is not None:
+                                st.session_state["fw_predecessors"] = fw_preds
+                                st.session_state["fw_distances"] = fw_dists
+                                st.session_state["fw_graph_id"] = id(G) # Store ID of graph used for FW
+                                st.success("Cálculo de Floyd-Warshall completado y almacenado.")
+                            else:
+                                st.error("Error al calcular Floyd-Warshall.")
+                                # Prevent further execution in this branch if FW failed
+                                st.session_state["ruta_actual"] = None
+                                st.rerun() 
+                        
+                        # Proceed if FW data is available
+                        if "fw_predecessors" in st.session_state and "fw_distances" in st.session_state:
+                            fw_preds = st.session_state["fw_predecessors"]
+                            fw_dists = st.session_state["fw_distances"]
+                            ruta = reconstruct_path_from_floyd_warshall(fw_preds, origen, destino)
+                            
+                            if ruta:
+                                # Get cost from fw_dists if available and valid
+                                if origen in fw_dists and destino in fw_dists[origen]:
+                                    costo = fw_dists[origen][destino]
+                                    if costo == float('inf'):
+                                        st.error(f"No existe ruta de {origen} a {destino} según Floyd-Warshall (distancia infinita).")
+                                        ruta = None # Mark ruta as None if path is not valid
+                                    else:
+                                        st.success(f"Ruta (Floyd-Warshall - Weight Only): {' → '.join(ruta)} | Costo: {costo:.2f}")
+                                        st.warning("Nota: La ruta Floyd-Warshall NO considera restricciones de batería.")
+                                else: # Should not happen if reconstruct_path worked and returned a path
+                                    st.error("Error al obtener el costo de Floyd-Warshall.")
+                                    ruta = None
+                            else:
+                                st.error(f"No se encontró ruta de {origen} a {destino} con Floyd-Warshall.")
+                        else: # Should be caught by earlier error message
+                            st.error("Datos de Floyd-Warshall no disponibles. Intente de nuevo.")
+
+                    if ruta:
                         st.session_state["ruta_actual"] = ruta
+                    else:
+                        st.session_state["ruta_actual"] = None
+                    st.rerun() # Rerun to update map display based on new ruta_actual
 
             # Botón Complete Delivery siempre visible
             if st.button("Complete Delivery", key="complete_delivery"):
@@ -111,12 +220,32 @@ with tabs[1]:
                     st.info("No hay ninguna orden pendiente con este origen y destino.")
 
             # Mostrar ruta actual si existe
-            if "ruta_actual" in st.session_state and st.session_state["ruta_actual"]:
+            if "ruta_actual" in st.session_state and st.session_state["ruta_actual"] and not st.session_state.get("show_mst", False):
                 st.success(f"Ruta actual: {' → '.join(st.session_state['ruta_actual'])}")
+            elif st.session_state.get("show_mst", False) and "mst_edges" in st.session_state:
+                 st.success(f"Mostrando MST con {len(st.session_state['mst_edges'])} aristas.")
             else:
-                st.info("Calcula una ruta para verla aquí.")
+                st.info("Calcula una ruta o MST para verla aquí.")
+
+            st.markdown("---") # Separator
+            if st.button("🌳 Show Minimum Spanning Tree (Kruskal)", key="show_mst_btn"):
+                if G:
+                    mst_edges = kruskal_mst(G)
+                    st.session_state["mst_edges"] = mst_edges
+                    st.session_state["show_mst"] = True
+                    st.session_state["ruta_actual"] = None # Clear current route when showing MST
+                    st.rerun()
+                else:
+                    st.warning("El grafo no está disponible. Inicia una simulación.")
+            
+            if st.session_state.get("show_mst", False):
+                if st.button("Clear MST Display", key="clear_mst_btn"):
+                    st.session_state["show_mst"] = False
+                    st.session_state["mst_edges"] = None
+                    st.rerun()
+
     else:
-        st.info("Primero inicializa la simulación en la pestaña 'Run Simulation' y genera órdenes.")
+        st.info("Primero inicializa la simulación en la pestaña 'Run Simulation'.") # Corrected message placement
 
 with tabs[2]:
     st.header("Clients and Orders")
@@ -142,7 +271,19 @@ with tabs[2]:
         }))
 
         st.subheader("Órdenes Generadas")
-        st.table(df_ordenes[["id", "cliente", "origen", "destino", "status", "fecha_creacion", "prioridad", "fecha_entrega", "costo_total"]])
+        # Added "cliente_id" to the list of columns for the orders table
+        st.table(df_ordenes[["id", "cliente", "cliente_id", "origen", "destino", "status", "fecha_creacion", "prioridad", "fecha_entrega", "costo_total"]].rename(columns={
+            "id": "Order ID",
+            "cliente": "Cliente Nombre",
+            "cliente_id": "Cliente ID",
+            "origen": "Origen (Nodo ID)",
+            "destino": "Destino (Nodo ID)",
+            "status": "Status",
+            "fecha_creacion": "Fecha Creación",
+            "prioridad": "Prioridad",
+            "fecha_entrega": "Fecha Entrega",
+            "costo_total": "Costo Total"
+        }))
     else:
         st.info("Primero inicializa la simulación en la pestaña 'Run Simulation'.")
 
@@ -168,7 +309,26 @@ with tabs[3]:
     st.subheader("Visualización del Árbol AVL de Rutas")
     visualizar_avl(root)
 
-
+    st.markdown("---")
+    st.subheader("📄 Generar Informe PDF del Sistema")
+    if rutas_usadas and "nodos" in st.session_state and "ordenes" in st.session_state:
+        if st.button("Generar y Descargar PDF", key="pdf_report_button"):
+            with st.spinner("Generando PDF... esto puede tardar unos segundos."):
+                nodos_report = st.session_state["nodos"]
+                ordenes_report = st.session_state["ordenes"]
+                # rutas_usadas is already available
+                
+                pdf_buffer = generate_report_pdf(nodos_report, ordenes_report, rutas_usadas)
+                
+                st.download_button(
+                    label="📥 Descargar Informe PDF",
+                    data=pdf_buffer,
+                    file_name=f"informe_simulacion_drones_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                    mime="application/pdf"
+                )
+                st.success("¡Informe PDF listo para descargar!")
+    else:
+        st.info("Se requieren datos de simulación (nodos, órdenes y rutas usadas) para generar el informe PDF.")
 
 from collections import Counter
 

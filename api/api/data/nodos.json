@@ -1,0 +1,146 @@
+[
+    {
+        "id": "A",
+        "role": "storage",
+        "lat": -38.71490218025985,
+        "lon": -72.61062425595523
+    },
+    {
+        "id": "B",
+        "role": "storage",
+        "lat": -38.72397417828603,
+        "lon": -72.63520842918855
+    },
+    {
+        "id": "C",
+        "role": "storage",
+        "lat": -38.7187681730859,
+        "lon": -72.64398790415888
+    },
+    {
+        "id": "D",
+        "role": "recharge",
+        "lat": -38.707231548005936,
+        "lon": -72.57018221417312
+    },
+    {
+        "id": "E",
+        "role": "recharge",
+        "lat": -38.716871388158715,
+        "lon": -72.55796378274522
+    },
+    {
+        "id": "F",
+        "role": "recharge",
+        "lat": -38.741102683093125,
+        "lon": -72.58124958537174
+    },
+    {
+        "id": "G",
+        "role": "client",
+        "client_id": "C001",
+        "nombre": "Client0",
+        "tipo": "premium",
+        "lat": -38.75692422136112,
+        "lon": -72.64265098670056
+    },
+    {
+        "id": "H",
+        "role": "client",
+        "client_id": "C002",
+        "nombre": "Client1",
+        "tipo": "normal",
+        "lat": -38.74347880489065,
+        "lon": -72.59522153831126
+    },
+    {
+        "id": "I",
+        "role": "client",
+        "client_id": "C003",
+        "nombre": "Client2",
+        "tipo": "premium",
+        "lat": -38.73807147198798,
+        "lon": -72.60422413097598
+    },
+    {
+        "id": "J",
+        "role": "client",
+        "client_id": "C004",
+        "nombre": "Client3",
+        "tipo": "normal",
+        "lat": -38.75284686134609,
+        "lon": -72.57059118500469
+    },
+    {
+        "id": "K",
+        "role": "client",
+        "client_id": "C005",
+        "nombre": "Client4",
+        "tipo": "premium",
+        "lat": -38.7208990380052,
+        "lon": -72.5832609589527
+    },
+    {
+        "id": "L",
+        "role": "client",
+        "client_id": "C006",
+        "nombre": "Client5",
+        "tipo": "premium",
+        "lat": -38.73730569500375,
+        "lon": -72.59485626321931
+    },
+    {
+        "id": "M",
+        "role": "client",
+        "client_id": "C007",
+        "nombre": "Client6",
+        "tipo": "normal",
+        "lat": -38.701180915713806,
+        "lon": -72.6486236122982
+    },
+    {
+        "id": "N",
+        "role": "client",
+        "client_id": "C008",
+        "nombre": "Client7",
+        "tipo": "normal",
+        "lat": -38.757295827091134,
+        "lon": -72.62526464869349
+    },
+    {
+        "id": "O",
+        "role": "client",
+        "client_id": "C009",
+        "nombre": "Client8",
+        "tipo": "premium",
+        "lat": -38.76275047672433,
+        "lon": -72.63959326490144
+    },
+    {
+        "id": "P",
+        "role": "client",
+        "client_id": "C010",
+        "nombre": "Client9",
+        "tipo": "premium",
+        "lat": -38.708475935837924,
+        "lon": -72.62899084574019
+    },
+    {
+        "id": "Q",
+        "role": "client",
+        "client_id": "C011",
+        "nombre": "Client10",
+        "tipo": "normal",
+        "lat": -38.76582445463275,
+        "lon": -72.61556831719258
+    },
+    {
+        "id": "R",
+        "role": "client",
+        "client_id": "C012",
+        "nombre": "Client11",
+        "tipo": "premium",
+        "lat": -38.722975523001956,
+        "lon": -72.56047776219833
+    }
+]

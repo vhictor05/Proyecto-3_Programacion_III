@@ -1,0 +1,231 @@
+{
+    "directed": false,
+    "multigraph": false,
+    "graph": {},
+    "nodes": [
+        {
+            "role": "storage",
+            "id": "A"
+        },
+        {
+            "role": "storage",
+            "id": "B"
+        },
+        {
+            "role": "storage",
+            "id": "C"
+        },
+        {
+            "role": "recharge",
+            "id": "D"
+        },
+        {
+            "role": "recharge",
+            "id": "E"
+        },
+        {
+            "role": "recharge",
+            "id": "F"
+        },
+        {
+            "role": "client",
+            "id": "G"
+        },
+        {
+            "role": "client",
+            "id": "H"
+        },
+        {
+            "role": "client",
+            "id": "I"
+        },
+        {
+            "role": "client",
+            "id": "J"
+        },
+        {
+            "role": "client",
+            "id": "K"
+        },
+        {
+            "role": "client",
+            "id": "L"
+        },
+        {
+            "role": "client",
+            "id": "M"
+        },
+        {
+            "role": "client",
+            "id": "N"
+        },
+        {
+            "role": "client",
+            "id": "O"
+        },
+        {
+            "role": "client",
+            "id": "P"
+        },
+        {
+            "role": "client",
+            "id": "Q"
+        },
+        {
+            "role": "client",
+            "id": "R"
+        }
+    ],
+    "links": [
+        {
+            "weight": 1,
+            "source": "A",
+            "target": "B"
+        },
+        {
+            "weight": 6,
+            "source": "A",
+            "target": "Q"
+        },
+        {
+            "weight": 7,
+            "source": "A",
+            "target": "F"
+        },
+        {
+            "weight": 2,
+            "source": "A",
+            "target": "I"
+        },
+        {
+            "weight": 7,
+            "source": "B",
+            "target": "C"
+        },
+        {
+            "weight": 7,
+            "source": "B",
+            "target": "R"
+        },
+        {
+            "weight": 6,
+            "source": "C",
+            "target": "D"
+        },
+        {
+            "weight": 6,
+            "source": "C",
+            "target": "E"
+        },
+        {
+            "weight": 7,
+            "source": "D",
+            "target": "E"
+        },
+        {
+            "weight": 1,
+            "source": "D",
+            "target": "G"
+        },
+        {
+            "weight": 2,
+            "source": "E",
+            "target": "F"
+        },
+        {
+            "weight": 3,
+            "source": "E",
+            "target": "L"
+        },
+        {
+            "weight": 8,
+            "source": "E",
+            "target": "K"
+        },
+        {
+            "weight": 7,
+            "source": "F",
+            "target": "G"
+        },
+        {
+            "weight": 7,
+            "source": "G",
+            "target": "H"
+        },
+        {
+            "weight": 8,
+            "source": "H",
+            "target": "I"
+        },
+        {
+            "weight": 2,
+            "source": "H",
+            "target": "L"
+        },
+        {
+            "weight": 7,
+            "source": "I",
+            "target": "J"
+        },
+        {
+            "weight": 3,
+            "source": "I",
+            "target": "K"
+        },
+        {
+            "weight": 4,
+            "source": "J",
+            "target": "K"
+        },
+        {
+            "weight": 8,
+            "source": "J",
+            "target": "R"
+        },
+        {
+            "weight": 6,
+            "source": "K",
+            "target": "L"
+        },
+        {
+            "weight": 6,
+            "source": "L",
+            "target": "M"
+        },
+        {
+            "weight": 2,
+            "source": "L",
+            "target": "N"
+        },
+        {
+            "weight": 7,
+            "source": "M",
+            "target": "N"
+        },
+        {
+            "weight": 7,
+            "source": "N",
+            "target": "O"
+        },
+        {
+            "weight": 6,
+            "source": "O",
+            "target": "P"
+        },
+        {
+            "weight": 8,
+            "source": "P",
+            "target": "Q"
+        },
+        {
+            "weight": 2,
+            "source": "P",
+            "target": "R"
+        },
+        {
+            "weight": 3,
+            "source": "Q",
+            "target": "R"
+        }
+    ]
+}

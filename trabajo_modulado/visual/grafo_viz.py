@@ -1,9 +1,13 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 import streamlit as st
+import folium
+from streamlit_folium import st_folium
 
+# Temuco's approximate center
+TEMUCO_CENTER = [-38.7359, -72.5904]
 
-def visualizar_red(G, ruta=None):
+def visualizar_red(G, ruta=None): # This is the old function, will be replaced by folium map
     pos = nx.spring_layout(G, seed=42)
     role_colors = {"storage": "blue", "recharge": "green", "client": "red"}
     node_colors = [role_colors[G.nodes[n]["role"]] for n in G.nodes]
@@ -27,6 +31,68 @@ def visualizar_red(G, ruta=None):
     plt.title("Red de Drones - Nodos coloreados por rol")
     plt.axis('off')
     st.pyplot(plt.gcf())
+
+
+def visualizar_mapa_folium(G, ruta=None, mst_edges=None):
+    # Create a Folium map centered on Temuco
+    m = folium.Map(location=TEMUCO_CENTER, zoom_start=13)
+
+    role_colors_map = {"storage": "blue", "recharge": "green", "client": "red", "default": "gray"}
+    node_info = G.nodes(data=True)
+
+    # Add nodes to the map
+    for node_id, data in node_info:
+        lat = data.get("lat")
+        lon = data.get("lon")
+        role = data.get("role", "default")
+        color = role_colors_map.get(role, "gray")
+        
+        if lat is not None and lon is not None:
+            tooltip_text = f"ID: {node_id}<br>Role: {role}"
+            if role == "client":
+                tooltip_text += f"<br>Client ID: {data.get('client_id', 'N/A')}"
+                tooltip_text += f"<br>Name: {data.get('nombre', 'N/A')}"
+            
+            folium.CircleMarker(
+                location=[lat, lon],
+                radius=5,
+                color=color,
+                fill=True,
+                fill_color=color,
+                fill_opacity=0.7,
+                tooltip=tooltip_text
+            ).add_to(m)
+
+    # Add all edges to the map (thin gray lines)
+    for u, v, data in G.edges(data=True):
+        u_data = G.nodes[u]
+        v_data = G.nodes[v]
+        if all(k in u_data for k in ("lat", "lon")) and all(k in v_data for k in ("lat", "lon")):
+            points = [(u_data["lat"], u_data["lon"]), (v_data["lat"], v_data["lon"])]
+            folium.PolyLine(points, color="gray", weight=1, opacity=0.5).add_to(m)
+
+    # Highlight MST edges if provided (thicker, distinct color e.g., purple)
+    if mst_edges:
+        for u, v in mst_edges:
+            u_data = G.nodes[u]
+            v_data = G.nodes[v]
+            if all(k in u_data for k in ("lat", "lon")) and all(k in v_data for k in ("lat", "lon")):
+                points = [(u_data["lat"], u_data["lon"]), (v_data["lat"], v_data["lon"])]
+                folium.PolyLine(points, color="purple", weight=3, opacity=0.8, tooltip=f"MST Edge: {u}-{v}").add_to(m)
+    
+    # Highlight the specific route if provided (thicker, distinct color e.g., orange)
+    if ruta:
+        aristas_ruta = list(zip(ruta, ruta[1:]))
+        for u, v in aristas_ruta:
+            u_data = G.nodes[u]
+            v_data = G.nodes[v]
+            if all(k in u_data for k in ("lat", "lon")) and all(k in v_data for k in ("lat", "lon")):
+                points = [(u_data["lat"], u_data["lon"]), (v_data["lat"], v_data["lon"])]
+                folium.PolyLine(points, color="orange", weight=4, opacity=1, tooltip=f"Route: {u} → {v}").add_to(m)
+
+    # Display the map in Streamlit
+    st_folium(m, width=700, height=500)
+
 
 def asignar_etiquetas_cortas(nodos_ids):
     """
