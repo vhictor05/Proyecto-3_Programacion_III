@@ -3,7 +3,7 @@ import subprocess
 if __name__ == "__main__":
     command = [
         "uvicorn",
-        "main:app",
+        "api.main:app",
         "--reload",
         "--host",
         "127.0.0.1",
