@@ -53,27 +53,43 @@ def generate_report_pdf(nodos, ordenes, rutas_usadas):
 
     # --- Section: Clientes Más Recurrentes ---
     story.append(Paragraph("Clientes Más Recurrentes (por nº de órdenes)", styles['h2']))
-    if ordenes:
+    
+    if not ordenes:
+        story.append(Paragraph("No hay datos de órdenes.", styles['Normal']))
+        story.append(Spacer(1, 0.2*inch))
+    else:
         df_ordenes = pd.DataFrame(ordenes)
-        # Ensure 'cliente_id' exists; if not, this part might need adjustment based on actual data structure
-        if 'cliente_id' in df_ordenes.columns:
+    
+        # Validación extra: asegurar que existe cliente_id y que tiene valores válidos
+        if 'cliente_id' in df_ordenes.columns and df_ordenes['cliente_id'].notnull().any():
             client_counts = df_ordenes['cliente_id'].value_counts().reset_index()
             client_counts.columns = ['cliente_id', 'total_ordenes']
-            
-            # Get client names
-            df_nodos_clientes = pd.DataFrame([n for n in nodos if n['role'] == 'client'])
-            if not df_nodos_clientes.empty and 'client_id' in df_nodos_clientes.columns:
-                 client_counts = pd.merge(client_counts, df_nodos_clientes[['client_id', 'nombre']], on='cliente_id', how='left')
-                 client_counts['nombre'] = client_counts['nombre'].fillna('N/A') # Handle if client name not found
-                 data_clients = [["Cliente ID", "Nombre", "Total Órdenes"]]
-                 for _, row in client_counts.head(10).iterrows(): # Top 10 clients
+    
+            # Buscar nombres de clientes en nodos
+            df_nodos_clientes = pd.DataFrame([n for n in nodos if n.get('role') == 'client'])
+            tiene_nombres = (not df_nodos_clientes.empty) and ('client_id' in df_nodos_clientes.columns)
+    
+            if tiene_nombres:
+                client_counts = pd.merge(
+                    client_counts,
+                    df_nodos_clientes[['client_id', 'nombre']],
+                    left_on='cliente_id',
+                    right_on='client_id',
+                    how='left'
+                )
+                client_counts['nombre'] = client_counts['nombre'].fillna('N/A')
+                data_clients = [["Cliente ID", "Nombre", "Total Órdenes"]]
+                for _, row in client_counts.head(10).iterrows():
                     data_clients.append([row['cliente_id'], row['nombre'], str(row['total_ordenes'])])
-            else: # Fallback if client names can't be easily merged
+            else:
                 data_clients = [["Cliente ID", "Total Órdenes"]]
                 for _, row in client_counts.head(10).iterrows():
                     data_clients.append([row['cliente_id'], str(row['total_ordenes'])])
-
-            table_clients = Table(data_clients, colWidths=[1*inch, 2.5*inch, 1.5*inch] if len(data_clients[0])==3 else [2*inch, 2*inch])
+    
+            table_clients = Table(
+                data_clients,
+                colWidths=[1*inch, 2.5*inch, 1.5*inch] if len(data_clients[0]) == 3 else [2*inch, 2*inch]
+            )
             table_clients.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
@@ -81,13 +97,12 @@ def generate_report_pdf(nodos, ordenes, rutas_usadas):
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
                 ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                ('GRID', (0,0), (-1,-1), 1, colors.black)
+                ('GRID', (0, 0), (-1, -1), 1, colors.black)
             ]))
             story.append(table_clients)
         else:
-            story.append(Paragraph("No hay datos de 'cliente_id' en las órdenes para generar este reporte.", styles['Normal']))
-    else:
-        story.append(Paragraph("No hay datos de órdenes.", styles['Normal']))
+            story.append(Paragraph("No hay datos válidos de 'cliente_id' en las órdenes para generar este reporte.", styles['Normal']))
+    
     story.append(Spacer(1, 0.2*inch))
 
     # --- Section: Nodos Más Utilizados ---
