@@ -41,10 +41,10 @@
         "cliente_id": "C002",
         "origen": "H",
         "destino": "B",
-        "status": "Pendiente",
+        "status": "Delivered",
         "fecha_creacion": "2025-07-03 00:19:01",
         "prioridad": 1,
-        "fecha_entrega": null,
+        "fecha_entrega": "2025-07-03 15:03:22",
         "costo_total": 0
     },
     {

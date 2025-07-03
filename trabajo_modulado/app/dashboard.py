@@ -253,6 +253,10 @@ with tabs[1]:
 with tabs[2]:
     st.header("Clients and Orders")
     if "nodos" in st.session_state:
+        # Botón para recargar órdenes desde FastAPI (ordenes.json actualizado)
+        if st.button("🔄 Recargar órdenes", key="reload_orders_btn"):
+            st.rerun()
+
         clientes = [n for n in st.session_state["nodos"] if n["role"] == "client"]
         # Leer siempre el archivo actualizado de ordenes.json
         try:
