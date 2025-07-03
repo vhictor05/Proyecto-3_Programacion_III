@@ -210,9 +210,12 @@ with tabs[1]:
                     orden_coincidente["fecha_entrega"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     st.success(f"Orden {orden_coincidente['id']} marcada como entregada en {orden_coincidente['fecha_entrega']}")
 
-                    # Guardar ruta en rutas completadas
-                    ruta_actual = st.session_state.get("ruta_actual", None)
-    
+                    # Guardar cambios en el archivo para que FastAPI los vea
+                    try:
+                        with open("api/data/ordenes.json", "w") as f:
+                            json.dump(ordenes, f, indent=4)
+                    except Exception as e:
+                        st.error(f"Error al guardar cambios en ordenes.json: {e}")
 
                     st.session_state["ordenes"] = ordenes
                     st.session_state["ruta_actual"] = None
@@ -249,41 +252,53 @@ with tabs[1]:
 
 with tabs[2]:
     st.header("Clients and Orders")
-    if "nodos" in st.session_state and "ordenes" in st.session_state:
+    if "nodos" in st.session_state:
         clientes = [n for n in st.session_state["nodos"] if n["role"] == "client"]
-        ordenes = st.session_state["ordenes"]
+        # Leer siempre el archivo actualizado de ordenes.json
+        try:
+            with open("api/data/ordenes.json", "r") as f:
+                ordenes = json.load(f)
+        except Exception as e:
+            st.error(f"Error al leer ordenes.json: {e}")
+            ordenes = []
 
         import pandas as pd
         df_ordenes = pd.DataFrame(ordenes)
-        conteo_ordenes = df_ordenes.groupby("cliente_id").size().reset_index(name="total_ordenes")
+        conteo_ordenes = df_ordenes.groupby("cliente_id").size().reset_index(name="total_ordenes") if not df_ordenes.empty else pd.DataFrame(columns=["cliente_id", "total_ordenes"])
 
         df_clientes = pd.DataFrame(clientes)
-        df_clientes = df_clientes.merge(conteo_ordenes, how="left", left_on="client_id", right_on="cliente_id")
-        df_clientes["total_ordenes"] = df_clientes["total_ordenes"].fillna(0).astype(int)
+        if not df_clientes.empty:
+            df_clientes = df_clientes.merge(conteo_ordenes, how="left", left_on="client_id", right_on="cliente_id")
+            df_clientes["total_ordenes"] = df_clientes["total_ordenes"].fillna(0).astype(int)
 
-        st.subheader("Lista de Clientes Activos con Total de Órdenes")
-        st.table(df_clientes[["id", "client_id", "nombre", "tipo", "total_ordenes"]].rename(columns={
-            "id": "Nodo ID",
-            "client_id": "Client ID",
-            "nombre": "Nombre",
-            "tipo": "Tipo",
-            "total_ordenes": "Total Órdenes"
-        }))
+            st.subheader("Lista de Clientes Activos con Total de Órdenes")
+            st.table(df_clientes[["id", "client_id", "nombre", "tipo", "total_ordenes"]].rename(columns={
+                "id": "Nodo ID",
+                "client_id": "Client ID",
+                "nombre": "Nombre",
+                "tipo": "Tipo",
+                "total_ordenes": "Total Órdenes"
+            }))
+        else:
+            st.info("No hay clientes para mostrar.")
 
         st.subheader("Órdenes Generadas")
         # Added "cliente_id" to the list of columns for the orders table
-        st.table(df_ordenes[["id", "cliente", "cliente_id", "origen", "destino", "status", "fecha_creacion", "prioridad", "fecha_entrega", "costo_total"]].rename(columns={
-            "id": "Order ID",
-            "cliente": "Cliente Nombre",
-            "cliente_id": "Cliente ID",
-            "origen": "Origen (Nodo ID)",
-            "destino": "Destino (Nodo ID)",
-            "status": "Status",
-            "fecha_creacion": "Fecha Creación",
-            "prioridad": "Prioridad",
-            "fecha_entrega": "Fecha Entrega",
-            "costo_total": "Costo Total"
-        }))
+        if not df_ordenes.empty:
+            st.table(df_ordenes[["id", "cliente", "cliente_id", "origen", "destino", "status", "fecha_creacion", "prioridad", "fecha_entrega", "costo_total"]].rename(columns={
+                "id": "Order ID",
+                "cliente": "Cliente Nombre",
+                "cliente_id": "Cliente ID",
+                "origen": "Origen (Nodo ID)",
+                "destino": "Destino (Nodo ID)",
+                "status": "Status",
+                "fecha_creacion": "Fecha Creación",
+                "prioridad": "Prioridad",
+                "fecha_entrega": "Fecha Entrega",
+                "costo_total": "Costo Total"
+            }))
+        else:
+            st.info("No hay órdenes para mostrar.")
     else:
         st.info("Primero inicializa la simulación en la pestaña 'Run Simulation'.")
 

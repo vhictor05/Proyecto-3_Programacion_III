@@ -16,11 +16,11 @@
             "id": "C"
         },
         {
-            "role": "storage",
+            "role": "recharge",
             "id": "D"
         },
         {
-            "role": "storage",
+            "role": "recharge",
             "id": "E"
         },
         {
@@ -28,19 +28,19 @@
             "id": "F"
         },
         {
-            "role": "recharge",
+            "role": "client",
             "id": "G"
         },
         {
-            "role": "recharge",
+            "role": "client",
             "id": "H"
         },
         {
-            "role": "recharge",
+            "role": "client",
             "id": "I"
         },
         {
-            "role": "recharge",
+            "role": "client",
             "id": "J"
         },
         {
@@ -62,168 +62,108 @@
         {
             "role": "client",
             "id": "O"
-        },
-        {
-            "role": "client",
-            "id": "P"
-        },
-        {
-            "role": "client",
-            "id": "Q"
-        },
-        {
-            "role": "client",
-            "id": "R"
-        },
-        {
-            "role": "client",
-            "id": "S"
-        },
-        {
-            "role": "client",
-            "id": "T"
-        },
-        {
-            "role": "client",
-            "id": "U"
-        },
-        {
-            "role": "client",
-            "id": "V"
-        },
-        {
-            "role": "client",
-            "id": "W"
-        },
-        {
-            "role": "client",
-            "id": "X"
-        },
-        {
-            "role": "client",
-            "id": "Y"
         }
     ],
     "links": [
         {
-            "weight": 5,
+            "weight": 8,
             "source": "A",
             "target": "B"
         },
         {
-            "weight": 6,
+            "weight": 7,
             "source": "B",
             "target": "C"
         },
         {
-            "weight": 3,
+            "weight": 6,
             "source": "C",
             "target": "D"
         },
         {
-            "weight": 5,
+            "weight": 4,
+            "source": "C",
+            "target": "L"
+        },
+        {
+            "weight": 8,
             "source": "D",
             "target": "E"
         },
         {
-            "weight": 3,
+            "weight": 2,
+            "source": "D",
+            "target": "H"
+        },
+        {
+            "weight": 1,
+            "source": "D",
+            "target": "F"
+        },
+        {
+            "weight": 2,
             "source": "E",
             "target": "F"
         },
         {
-            "weight": 4,
+            "weight": 7,
+            "source": "E",
+            "target": "M"
+        },
+        {
+            "weight": 3,
             "source": "F",
             "target": "G"
         },
         {
-            "weight": 8,
+            "weight": 2,
             "source": "G",
             "target": "H"
         },
         {
-            "weight": 2,
+            "weight": 6,
             "source": "H",
             "target": "I"
         },
         {
             "weight": 4,
-            "source": "I",
-            "target": "J"
-        },
-        {
-            "weight": 3,
-            "source": "J",
-            "target": "K"
-        },
-        {
-            "weight": 7,
-            "source": "K",
-            "target": "L"
-        },
-        {
-            "weight": 2,
-            "source": "L",
+            "source": "H",
             "target": "M"
         },
         {
             "weight": 7,
+            "source": "I",
+            "target": "J"
+        },
+        {
+            "weight": 1,
+            "source": "I",
+            "target": "M"
+        },
+        {
+            "weight": 2,
+            "source": "J",
+            "target": "K"
+        },
+        {
+            "weight": 8,
+            "source": "K",
+            "target": "L"
+        },
+        {
+            "weight": 9,
+            "source": "L",
+            "target": "M"
+        },
+        {
+            "weight": 1,
             "source": "M",
             "target": "N"
         },
         {
-            "weight": 4,
+            "weight": 2,
             "source": "N",
             "target": "O"
-        },
-        {
-            "weight": 4,
-            "source": "O",
-            "target": "P"
-        },
-        {
-            "weight": 8,
-            "source": "P",
-            "target": "Q"
-        },
-        {
-            "weight": 1,
-            "source": "Q",
-            "target": "R"
-        },
-        {
-            "weight": 5,
-            "source": "R",
-            "target": "S"
-        },
-        {
-            "weight": 3,
-            "source": "S",
-            "target": "T"
-        },
-        {
-            "weight": 9,
-            "source": "T",
-            "target": "U"
-        },
-        {
-            "weight": 2,
-            "source": "U",
-            "target": "V"
-        },
-        {
-            "weight": 8,
-            "source": "V",
-            "target": "W"
-        },
-        {
-            "weight": 1,
-            "source": "W",
-            "target": "X"
-        },
-        {
-            "weight": 5,
-            "source": "X",
-            "target": "Y"
         }
     ]
 }
